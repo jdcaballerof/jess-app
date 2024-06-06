@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "ag-grid-react": "^31.3.2",
+    "primeicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
