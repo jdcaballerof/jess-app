@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Input } from './components/inputs/Input';
+import { Input } from './components/ui/inputs/Input';
 import { TableSimple } from './components/Table/TableSimple';
 //@ts-ignore
 import { ColDef } from 'ag-grid-community/core';
-import { OpenCamera } from './components/take-photos/OpenCamara';
+import { Button } from './components/ui/buttons';
 
 
 // Row Data Interface
@@ -101,7 +101,7 @@ function App() {
             <h1 className='text-6xl my-9 font-bold'>Reportes</h1>
 
             {/* //& FORM    */}
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto my-10">
                 <div className='grid grid-cols-4 gap-3'>
                     <Input
                         label='Title'
@@ -127,9 +127,6 @@ function App() {
                         onChange={handleFileChange}
                         divClassName='col-span-2'
                     />
-                    {/* <div>
-                        <OpenCamera />
-                    </div> */}
 
                     {image && (
                         <div className="mt-2 col-span-4">
@@ -141,21 +138,9 @@ function App() {
                 </div>
 
                 <div>
-                    <button
-                        onClick={addTask}
-                        className="mt-6 my-3 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                    >
-                        Add
-                    </button>
-                    
-                    <button
-                        onClick={reset}
-                        className="col-span-1 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                    >
-                        Cancel
-                    </button>
+                    <Button bgColor='green' label='Add' onClick={addTask}/>
+                    <Button bgColor='red' label='Cancel' onClick={reset}/>
                 </div>
-
             </div>
 
             { tasks.length ?  <TableSimple cols={cols} data={tasks} /> : <></>}
