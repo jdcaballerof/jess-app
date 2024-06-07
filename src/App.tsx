@@ -4,14 +4,22 @@ import { TableSimple } from './components/Table/TableSimple';
 //@ts-ignore
 import { ColDef } from 'ag-grid-community/core';
 import { Button } from './components/ui/buttons';
+import { exportTablePDF } from './utils/pdf/makeTablePDF';
+import { tasksToPDF } from './utils/pdf/tasksPDF';
 
 
 // Row Data Interface
-interface Task {
+export interface Task {
     id:     number;
     title:  string;
     input:  string;
-    image:  string;
+    image?:  Img;
+}
+
+interface Img {
+    url,
+    width: number,
+    height: number,
 }
 
 
@@ -21,18 +29,27 @@ function App() {
     const [tasks, setTasks] = useState<Task[]>( JSON.parse(localStorage.getItem('tasks') || '[]'));
     const [input, setInput] = useState('');
     const [title, setTitle] = useState('');
-    const [image, setImage] = useState('');
+    const [image, setImage] = useState<Img>();
     // // const [selectedFile, setSelectedFile] = useState(null);
 
     const reset = () => {
         setTitle('');
         setInput('');
-        setImage('');
+        setImage(undefined);
         // Clear the file input
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     }
+
+    const getAdjustedDimensions = (width, height, maxWidth) => {
+        let newWidth = (width>maxWidth) ? maxWidth : width; 
+        let newHeight = (width>maxWidth) ? (height*maxWidth/width): height;
+    
+        console.table([{width, height}, {width: newWidth, height: newHeight}])
+    
+        return [newWidth, newHeight];
+    };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -41,13 +58,18 @@ function App() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result;
-                setImage(base64String as string);
+                const img = new Image();
+                img.src = base64String as string;
+                img.onload = () => {
+                    const [ width, height ] = getAdjustedDimensions(img.width, img.height, 35);
+                    setImage({url: base64String as string, width, height});
+                };
             };
             reader.readAsDataURL(file);
         } else {
-            setImage('');
+            setImage(undefined);
         }
-    };
+    };    
 
     const addTask = () => {
         if (input.trim()) {
@@ -96,6 +118,12 @@ function App() {
     ]);
 
 
+    const printTasksPDF = () => {
+        tasksToPDF(tasks, cols.slice(0,3))
+        // const pdf = exportTablePDF(tasks, cols)
+    }
+
+
     return (
         <>
             <h1 className='text-6xl my-9 font-bold'>Reportes</h1>
@@ -131,7 +159,7 @@ function App() {
                     {image && (
                         <div className="mt-2 col-span-4">
                             {image && (
-                                <img src={image} alt="Preview" className="mt-2 mx-auto w-32 h-32 object-cover rounded" />
+                                <img src={image.url} alt="Preview" className="mt-2 mx-auto w-32 h-32 object-cover rounded" />
                             )}
                         </div>
                     )}
@@ -143,7 +171,11 @@ function App() {
                 </div>
             </div>
 
-            { tasks.length ?  <TableSimple cols={cols} data={tasks} /> : <></>}
+            <div className='flex-end'>
+                <Button bgColor='rose' label='PDF' onClick={printTasksPDF}/>
+            </div>
+
+            { tasks.length ?  <TableSimple cols={cols} data={tasks.map( t => ({...t, image: t.image?.url}) )} /> : <></>}
         </>
     )
 }
