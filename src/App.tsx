@@ -6,6 +6,7 @@ import { ColDef } from 'ag-grid-community/core';
 import { Button } from './components/ui/buttons';
 import { exportTablePDF } from './utils/pdf/makeTablePDF';
 import { tasksToPDF } from './utils/pdf/tasksPDF';
+import { WebcamCapture } from './webcam/WebcamCapture';
 
 
 // Row Data Interface
@@ -171,11 +172,19 @@ function App() {
                 </div>
             </div>
 
-            <div className='flex-end'>
-                <Button bgColor='rose' label='PDF' onClick={printTasksPDF}/>
+            <div className='mx-auto my-4' style={{backgroundColor: 'pink', width: '32rem', minHeight:'2rem', border: 'solid 4px white'}}>
+                    <WebcamCapture />
             </div>
 
-            { tasks.length ?  <TableSimple cols={cols} data={tasks.map( t => ({...t, image: t.image?.url}) )} /> : <></>}
+
+            { !!tasks.length &&
+            <>
+                <div className='flex-end'>
+                    <Button bgColor='rose' label='PDF' onClick={printTasksPDF}/>
+                </div>
+                <TableSimple cols={cols} data={tasks.map( t => ({...t, image: t.image?.url}) )} /> 
+            </>
+            }
         </>
     )
 }
